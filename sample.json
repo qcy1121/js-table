@@ -1,0 +1,51 @@
+{
+    "data": [{
+        "col1": {
+            "checked": true,
+            "image": {
+                "src": "http://121.199.29.202/group1/M00/00/07/CoQndFSos22ABFRJAAAhbM7bHG8313.jpg",
+                "alt": "asdf"
+            },
+            "desc": "预下架"
+        },
+        "col2": "wxGoods",
+        "col3": "quantity",
+        "col4": "curren",
+        "col5": "allsale",
+        "col6": "cname",
+        "col7": "date",
+        "col8": "asdf"
+    }, {
+        "col1": {
+            "checked": true,
+            "image": {
+                "src": "http://121.199.29.202/group1/M00/00/07/CoQndFSos22ABFRJAAAhbM7bHG8313.jpg",
+                "alt": "asdf"
+            },
+            "desc": "预下架"
+        },
+        "col2": "wxGoods",
+        "col3": "quantity",
+        "col4": "curren",
+        "col5": "allsale",
+        "col6": "cname",
+        "col7": "date",
+        "col8": "asdf"
+    }, {
+        "col1": {
+            "checked": true,
+            "image": {
+                "src": "http://121.199.29.202/group1/M00/00/07/CoQndFSos22ABFRJAAAhbM7bHG8313.jpg",
+                "alt": "asdf"
+            },
+            "desc": "预下架"
+        },
+        "col2": "wxGoods",
+        "col3": "quantity",
+        "col4": "curren",
+        "col5": "undefined",
+        "col6": "null",
+        "col8": "asdf"
+    }],
+    "count": 10
+}
