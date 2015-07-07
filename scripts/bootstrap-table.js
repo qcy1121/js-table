@@ -26,8 +26,6 @@
             options = options || {};
             //options.tableClass && (options.tableClass);
             this.init(options);
-            this.columnsConfig = columns;
-            this.initColumns(columns);
             //var renderTable = this.opts.renderTable||this.createTable
             if(this.opts.renderTable){
                 //this.$parent.append(this.renderTable())
@@ -41,6 +39,8 @@
                 }
                 this.loading = this.opts.loading||function(){};
             }else {
+                this.columnsConfig = columns;
+                this.initColumns(columns);
                 this.$parent.append(this.createTable());
             }
         };
