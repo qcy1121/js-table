@@ -312,6 +312,9 @@
                 tbody.empty().focus();
                 tbody.append(self.createEmptyRow('加载中。。。'));
             },
+            alert:function(res){
+                this.dataHelper.alert(res);
+            },
             binding: function (dataHelper) {
                 this.dataHelper = dataHelper;
             }
@@ -338,6 +341,9 @@
                 //  alert(msg);
                 //}
                 this.$parent.append(this.$body);
+            },
+            alert:function(res){
+                this.dataHelper.alert(res);
             },
             initData: function (pageData) {
                 var data = {}, self = this;
@@ -804,11 +810,12 @@
                 self.tableData = null;
                 self.paramData = this.getParamData();
                 self.alert = function (res) {
-                    window.alert(res);
+                    self.onError(res);
+                    //window.alert(res);
                 };
-                self.onError = function () {
-                    var res = '请求返回失败！';
-                    self.alert(res);
+                self.onError = function (res) {
+                    res = res||'请求返回失败！';
+                    window.alert(res);
                 };
             },
             getParamData: function () {
