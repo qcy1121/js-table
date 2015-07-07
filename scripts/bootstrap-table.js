@@ -28,7 +28,21 @@
             this.init(options);
             this.columnsConfig = columns;
             this.initColumns(columns);
-            this.$parent.append(this.createTable());
+            //var renderTable = this.opts.renderTable||this.createTable
+            if(this.opts.renderTable){
+                //this.$parent.append(this.renderTable())
+                var self = this,div = $('<div>');
+                this.$parent.append(div);
+                this.renderTableData = function(data){
+                    var dom = this.opts.renderTable(data,div);
+                    if(dom&&dom!=div){
+                        div.append(dom);
+                    }
+                }
+                this.loading = this.opts.loading||function(){};
+            }else {
+                this.$parent.append(this.createTable());
+            }
         };
         TableHelper.prototype = {
             init: function (options) {
@@ -140,9 +154,13 @@
             renderTableData: function (data) {
                 var tbody = this.$tableBody, self = this;
                 tbody.empty().focus();
+                var renderTableRow = self.opts.renderTableRow||self.createTableRow;
                 if (data && data.length) {
                     $.each(data, function (i, d) {
-                        tbody.append(self.createTableRow(i, d, tbody));
+                        var row = renderTableRow(i, d, tbody);
+                        if(row&&row !=tbody){
+                            tbody.append(row);
+                        }
                     });
                 } else {
                     self.opts.showNoData && tbody.append(self.createEmptyRow());
