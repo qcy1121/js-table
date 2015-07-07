@@ -37,7 +37,10 @@
                         div.append(dom);
                     }
                 }
-                this.loading = this.opts.loading||function(){};
+                this.loading =function(){
+                    var loading = this.opts.loading
+                    loading&&loading();
+                }
             }else {
                 this.columnsConfig = columns;
                 this.initColumns(columns);
@@ -157,7 +160,7 @@
                 var renderTableRow = self.opts.renderTableRow||self.createTableRow;
                 if (data && data.length) {
                     $.each(data, function (i, d) {
-                        var row = renderTableRow(i, d, tbody);
+                        var row = renderTableRow.call(self,i, d, tbody);
                         if(row&&row !=tbody){
                             tbody.append(row);
                         }

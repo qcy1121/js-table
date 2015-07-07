@@ -182,33 +182,33 @@ var demoTable = function (target, url, selectData, columns) {
 
         ],
 
-        renderTableRow:function(idx,rowdata,tbody) {
-            var html = "<tr>";
-            $.each(rowdata,function(i,d){
-                html+=('<td>'+i+"</td>");
-            });
-
-            return html+"</tr>";
-        },
-        renderTable:function(data,div){
-            var html = '<table>',header="<thead>",body = "<tbody>";
-            $.each(data[0],function(i,d){
-                header+="<td>"+i+"</td>"
-            });
-            header +="</thead>";
-            $.each(data,function(i,rowdata){
-                var row = '<tr>';
-                $.each(rowdata,function(idx,d){
-                    row+="<td>"+d+"</td>";
-                });
-                body+=row+'</tr>';
-            })
-            body+="</tbody>";
-            html+=header+body+'</table>';
-            console.log(html);
-            div.append(html);
-            //return html;
-        }
+        //renderTableRow:function(idx,rowdata,tbody) {
+        //    var html = "<tr>";
+        //    $.each(rowdata,function(i,d){
+        //        html+=('<td>'+i+"</td>");
+        //    });
+        //
+        //    return html+"</tr>";
+        //},
+        //renderTable:function(data,div){
+        //    var html = '<table>',header="<thead>",body = "<tbody>";
+        //    $.each(data[0],function(i,d){
+        //        header+="<td>"+i+"</td>"
+        //    });
+        //    header +="</thead>";
+        //    $.each(data,function(i,rowdata){
+        //        var row = '<tr>';
+        //        $.each(rowdata,function(idx,d){
+        //            row+="<td>"+d+"</td>";
+        //        });
+        //        body+=row+'</tr>';
+        //    })
+        //    body+="</tbody>";
+        //    html+=header+body+'</table>';
+        //    console.log(html);
+        //    div.append(html);
+        //    //return html;
+        //}
     }
     var bootstrapTable = $target.bootstrapTable(columns, tableOpts);
     return bootstrapTable;
