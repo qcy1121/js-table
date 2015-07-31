@@ -835,7 +835,7 @@
                     //window.alert(res);
                 };
                 self.onError = function (res) {
-                    res = res||'请求返回失败！';
+                    res = ((typeof res=='string')&&res)||'请求返回失败！';
                     window.alert(res);
                 };
             },
