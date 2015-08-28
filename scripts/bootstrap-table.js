@@ -430,7 +430,7 @@
                     if(key  == self.pageSize){
                         opts.selected='selected';
                     }
-                    $pageSize.append($("<option>",{value:key,text:key}))
+                    $pageSize.append($("<option>",opts))
                 });
                 $pageSize.on('change', function (e) {
                         var pageSize = $(this).val();
