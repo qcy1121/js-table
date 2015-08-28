@@ -128,8 +128,13 @@ var demoTable = function (target, url, selectData, columns) {
          dataCountField:'count',
          dataFiled:'data'
          }
-         }
+         },
          */
+         pageSettings:{
+            pageSize:30,
+            pageSizes:[5,15,30,50]
+         },
+
         queryFields: [
             //{type:types.search,field:'name',placeholder:'请输入商品名称',controlFn:function($node){$node.find('input').val('test');}}//,
             {

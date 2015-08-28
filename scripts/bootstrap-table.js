@@ -422,14 +422,17 @@
                 this.buildPager();
             },
             buildPager: function () {
-                var self = this;
-                self.$pageSize = $('<select/>')//.addClass('form-control')
-                    .append($('<option>', {value: 5, text: 5}))
-                    .append($('<option>', {value: 10, text: 10, selected: 'selected'}))
-                    .append($('<option>', {value: 15, text: 15}))
-                    .append($('<option>', {value: 20, text: 20}))
-                    .append($('<option>', {value: 25, text: 25}))
-                    .on('change', function (e) {
+                var self = this,
+                $pageSize = $('<select/>');//.addClass('form-control')
+                self.$pageSize = $pageSize;
+                $.each(self.pageSizes,function(i,key){
+                    var opts = {value:key,text:key};
+                    if(key  == self.pageSize){
+                        opts.selected='selected';
+                    }
+                    $pageSize.append($("<option>",{value:key,text:key}))
+                });
+                $pageSize.on('change', function (e) {
                         var pageSize = $(this).val();
                         self.pageSize = pageSize;
                         self.pageAll = 0;
@@ -469,7 +472,13 @@
                         self.refresh();
                     }
                 });
-                self.$pageInput = $('<input type="text">');
+                self.$pageInput = $('<input type="text">').on('keyup keypress', function(e) {//disable auto submit on enter
+                    var code = e.keyCode || e.which;
+                    if (code == 13) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
                 self.$pageGo = $('<a>').text('GO').on('click', function (e) {
                     var pageInput = self.$pageInput.val();
                     if (!pageInput)return;
@@ -783,6 +792,9 @@
             options = options || {};
             this.opts = {};
             $.extend(true, this.opts, this.defaultOpts, options);
+            if(this.opts.pageSettings) {
+                this.defaultPageOpts = $.extend({}, this.opts.pageSettings);
+            }
             this.convertUrl();
             this.init();
         }
@@ -808,7 +820,8 @@
                 pageSize: 10,
                 allRows: 1,
                 pageAll: 1,
-                pageCurrent: 1
+                pageCurrent: 1,
+                pageSizes:[5,10,15,20,25]
             },
             convertUrl: function () {
                 var url = this.opts.url, urlSegment = url.split('?'), urlData = {};
