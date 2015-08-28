@@ -793,7 +793,7 @@
 			this.opts = {};
 			$.extend(true, this.opts, this.defaultOpts, options);
 			if (this.opts.pageSettings) {
-				this.defaultPageOpts = $.extend({}, this.opts.pageSettings);
+				this.defaultPageOpts = $.extend({},this.defaultPageOpts, this.opts.pageSettings);
 			}
 			this.convertUrl();
 			this.init();
