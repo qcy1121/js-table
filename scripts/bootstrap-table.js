@@ -32,7 +32,7 @@
 				var self = this, div = $('<div>');
 				this.$parent.append(div);
 				this.renderTableData = function (data) {
-					var dom = this.opts.renderTable(data, div);
+					var dom = self.opts.renderTable(data, div);
 					if (dom && dom != div) {
 						div.append(dom);
 					}
@@ -368,12 +368,14 @@
 			},
 			initData: function (pageData) {
 				var data = {}, self = this;
+				self.initPageData={};
 				pageData = pageData || {};
 				$.extend(data, self.defaultOpts, pageData);
 				for (var i in data) {
 					var v = data[i];
 					if (typeof v != 'function') {
 						self[i] = v;
+						self.initPageData[i]=v;
 					}
 				}
 			},
@@ -511,11 +513,14 @@
 			},
 			render: function (res, clean) {
 				var self = this;
+				if (clean) {
+					//self.pageCurrent = 1;
+					$.each(self.initPageData,function(i,v){
+						self[i]=v;
+					})
+				}
 				self.allRows = res.allRows;
 				self.pageAll = Math.ceil(self.allRows / self.pageSize) || 1;
-				if (clean) {
-					self.pageCurrent = 1;
-				}
 				this.resetPageData();
 			}
 		}
@@ -702,8 +707,8 @@
 				var self = this, field = obj.field;
 				var div = $('<div class="form-group ' + (obj.cssClass || 'search') + '">'),
 					input = $('<input type="text" ' +
-						(obj.placeholder ? ' placeholder="' + obj.placeholder + '"' : '') +
-						' />'),
+					(obj.placeholder ? ' placeholder="' + obj.placeholder + '"' : '') +
+					' />'),
 					a = $('<a ></a>');
 				a.on('click', function () {
 					var val = input.val();
@@ -817,11 +822,11 @@
 				//,..others
 			},
 			defaultPageOpts: {
-				pageSize: 10,
-				allRows: 1,
-				pageAll: 1,
-				pageCurrent: 1,
-				pageSizes: [5, 10, 15, 20, 25]
+				pageSize: 10,//默认的每页条数
+				allRows: 1,//总条数，无需 修改
+				pageAll: 1,//总页数，无需修改
+				pageCurrent: 1,//当前页，无需修改
+				pageSizes: [5, 10, 20, 50, 100]//分页
 			},
 			convertUrl: function () {
 				var url = this.opts.url, urlSegment = url.split('?'), urlData = {};
@@ -849,7 +854,8 @@
 				};
 				self.onError = function (res) {
 					res = ((typeof res == 'string') && res) || '请求返回失败！';
-					window.alert(res);
+					//window.alert(res);
+					console.error(res);
 				};
 			},
 			getParamData: function () {
@@ -1111,4 +1117,3 @@
 	bootstrapTable.dataType = dataType;
 	$.fn.bootstrapTable = bootstrapTable;
 })(jQuery);
-
