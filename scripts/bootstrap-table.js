@@ -344,8 +344,9 @@
 	})();
 	var PagerHelper = (function () {
 
-		var PagerHelper = function (parent) {
+		var PagerHelper = function (parent,pagerOpts) {
 			this.$parent = $(parent);
+			this.pagerOpts = pagerOpts;
 			//this.dataHelper = dataHelper;
 
 		};
@@ -434,14 +435,6 @@
 					}
 					$pageSize.append($("<option>", opts))
 				});
-				$pageSize.on('change', function (e) {
-					var pageSize = $(this).val();
-					self.pageSize = pageSize;
-					self.pageAll = 0;
-					self.pageCurrent = 1;
-					self.allRows = 0;
-					self.refresh()
-				});
 				self.$allRows = $('<span ></span>');
 				self.$pageCurrent = $('<span ></span>');
 				self.$pageAll = $('<span></span>');
@@ -450,54 +443,12 @@
 					.append(self.$allRows).append($('<span/>').text('行 第'))
 					.append(self.$pageCurrent).append($('<span/>').text('页 共'))
 					.append(self.$pageAll).append($('<span>').text('页 '));
-				self.$pageHome = $('<a>').text('首页').on('click', function () {
-					if (self.pageCurrent != 1) {
-						self.pageCurrent = 1;
-						self.refresh();
-					}
-				});
-				self.$pagePrev = $('<a>').text('上一页').on('click', function (e) {
-					if (self.pageCurrent > 1) {
-						self.pageCurrent--;
-						self.refresh();
-					}
-				});
-				self.$pageNext = $('<a>').text('下一页').on('click', function (e) {
-					if (self.pageCurrent < self.pageAll) {
-						self.pageCurrent++;
-						self.refresh();
-					}
-				});
-				self.$pageLast = $('<a>').text('尾页').on('click', function (e) {
-					if (self.pageAll != self.pageCurrent) {
-						self.pageCurrent = self.pageAll;
-						self.refresh();
-					}
-				});
-				self.$pageInput = $('<input type="text">').on('keyup keypress', function (e) {//disable auto submit on enter
-					var code = e.keyCode || e.which;
-					if (code == 13) {
-						e.preventDefault();
-						return false;
-					}
-				});
-				self.$pageGo = $('<a>').text('GO').on('click', function (e) {
-					var pageInput = self.$pageInput.val();
-					if (!pageInput)return;
-					var msg = '请输入正确的页数!', errMsg;
-					if (!/^\d+$/.test(pageInput)) {
-						errMsg = msg;
-					} else if (pageInput > self.pageAll || pageInput < 1) {
-						errMsg = msg;
-					}
-					if (errMsg) {
-						self.alert(errMsg);
-						return;
-					} else {
-						self.pageCurrent = pageInput;
-						self.refresh();
-					}
-				});
+				self.$pageHome = $('<a>').text('首页');
+				self.$pagePrev = $('<a>').text('上一页');
+				self.$pageNext = $('<a>').text('下一页');
+				self.$pageLast = $('<a>').text('尾页');
+				self.$pageInput = $('<input type="text">');
+				self.$pageGo = $('<a>').text('GO');
 				self.$form
 					.append(self.$pageHome).append(' ')
 					.append(self.$pagePrev).append(' ')
@@ -505,11 +456,104 @@
 					.append(self.$pageLast).append(' ')
 					.append('页数：').append(self.$pageInput).append(' ')
 					.append(self.$pageGo);
-				self.resetPageData();
+			},
+			addEvent:function(){
+				var self = this;
+
+                self.$pageSize.on('change', function (e) {
+                    var pageSize = $(this).val();
+                    self.pageSize = pageSize;
+                    self.pageAll = 0;
+                    self.pageCurrent = 1;
+                    self.allRows = 0;
+                    self.refresh()
+                });
+                self.$pageHome .on('click', function () {
+                    if (self.pageCurrent != 1) {
+                        self.pageCurrent = 1;
+                        self.refresh();
+                    }
+                });
+                self.$pagePrev.on('click', function (e) {
+                    if (self.pageCurrent > 1) {
+                        self.pageCurrent--;
+                        self.refresh();
+                    }
+                });
+                self.$pageNext.on('click', function (e) {
+                    if (self.pageCurrent < self.pageAll) {
+                        self.pageCurrent++;
+                        self.refresh();
+                    }
+                });
+                self.$pageLast .on('click', function (e) {
+                    if (self.pageAll != self.pageCurrent) {
+                        self.pageCurrent = self.pageAll;
+                        self.refresh();
+                    }
+                });
+                self.$pageInput .on('keyup keypress', function (e) {//disable auto submit on enter
+                    var code = e.keyCode || e.which;
+                    if (code == 13) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+                self.$pageGo .on('click', function (e) {
+                    var pageInput = self.$pageInput.val();
+                    if (!pageInput)return;
+                    var msg = '请输入正确的页数!', errMsg;
+                    if (!/^\d+$/.test(pageInput)) {
+                        errMsg = msg;
+                    } else if (pageInput > self.pageAll || pageInput < 1) {
+                        errMsg = msg;
+                    }
+                    if (errMsg) {
+                        self.alert(errMsg);
+                        return;
+                    } else {
+                        self.pageCurrent = pageInput;
+                        self.refresh();
+                    }
+                });
 			},
 
 			init: function (options) {
-				this.buildBody();
+				this.initBody();
+				this.addEvent();
+			},
+			initBody:function(){
+				var self = this,opts = this.pagerOpts;
+				if(!opts){
+                    self.buildBody();
+                }else{
+					self.getBody(opts);
+				}
+                self.resetPageData();
+			},
+			getBody:function(opts){
+				console.log(opts);
+                var self = this;
+                self.$body = $('<div class="pages pageRight" style="margin-top:18px;" /> ');
+                self.$formOuter = $('<form class="form-inline" role="form"/>');
+                self.$form = $('<div class="form-group">');
+                self.$pageSize =  $('<select/>');//.addClass('form-control')
+                $.each(self.pageSizes, function (i, key) {
+                    var opts = {value: key, text: key};
+                    if (key == self.pageSize) {
+                        opts.selected = 'selected';
+                    }
+                    self.$pageSize.append($("<option>", opts))
+                });
+                self.$allRows = $('<span ></span>');
+                self.$pageCurrent = $('<span ></span>');
+                self.$pageAll = $('<span></span>');
+                self.$pageHome = $('<a>').text('首页');
+                self.$pagePrev = $('<a>').text('上一页');
+                self.$pageNext = $('<a>').text('下一页');
+                self.$pageLast = $('<a>').text('尾页');
+                self.$pageInput = $('<input type="text">');
+                self.$pageGo = $('<a>').text('GO');
 			},
 			render: function (res, clean) {
 				var self = this;
@@ -1069,7 +1113,7 @@
 			dh = new DataHelper(options),
 			qh = options.query === false ? null : new QueryHelper($this, options),
 			th = new TableHelper($this, columns, options),
-			ph = options.page === false ? null : new PagerHelper($this, options);
+			ph = options.page === false ? null : new PagerHelper($this, options.pageOpts);
 		dh.binding(th, qh, ph);
 		var outer = {
 			onDataLoaded: function (callback) {
