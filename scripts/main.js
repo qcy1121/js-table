@@ -149,7 +149,7 @@ var buildPager = function(dom){
     var i=start;
     if(hasHead)df.append('<span>...<<</span>');
     for(;i<=end;i++){
-        var pageA = $('<a href="javascript:void();" data-val="'+i+'">'+i+'</a>').on('click',function(){
+        var pageA = $('<a href="javascript:void(0)" data-val="'+i+'">'+i+'</a>').on('click',function(){
             var num = $(this).attr('data-val');
             helper.goToPageHd(num);
         })
