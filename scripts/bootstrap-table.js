@@ -396,6 +396,12 @@
 					self.pageAll = pageData.pageAll;
 					self.pageCurrent = pageData.pageCurrent;
 					self.allRows = pageData.allRows;
+				}else{
+					pageData = {};
+                    pageData.pageSize = self.pageSize;
+                    pageData.pageAll = self.pageAll;
+                    pageData.pageCurrent = self.pageCurrent;
+                    pageData.allRows = self.allRows;
 				}
 				self.$pageSize.val(self.pageSize);
 				self.$pageAll.text(self.pageAll);
@@ -522,9 +528,9 @@
                         var msg = helper.goToPageHd(pageInput);
                         msg && alert(msg);
                     },
-					onChangedFun:function(fun){
-                    	helper.changedFun = fun;
-					},
+					// onChangedFun:function(fun){
+                    	// helper.changedFun = fun;
+					// },
                     onResetPageDataHd:function(pageData){
                         helper.changedFun&&helper.changedFun(pageData);
 					},
@@ -1139,7 +1145,7 @@
 			dh = new DataHelper(options),
 			qh = options.query === false ? null : new QueryHelper($this, options),
 			th = new TableHelper($this, columns, options),
-			ph = options.page === false ? null : new PagerHelper($this, options.pageOpts);
+			ph = options.page === false ? null : new PagerHelper($this, options.pageDoms);
 		dh.binding(th, qh, ph);
 		var outer = {
 			onDataLoaded: function (callback) {

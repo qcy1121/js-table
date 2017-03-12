@@ -91,7 +91,74 @@ var drawTable = function (target) {
     }
     //$(".desc").text($(this).text());
 }
+var buildPager = function(dom){
+    var $body  = $("<div/>"),self = {};
+    // self.$formOuter = $('<form class="form-inline" role="form"/>');
+    // self.$form = $('<div class="form-group">');
+    // self.$pageSize = opts.$pageSize ||$('<select/>');//.addClass('form-control')
+    // opts.$pageSize||$.each(self.pageSizes, function (i, key) {
+    //     var option = {value: key, text: key};
+    //     if (key == self.pageSize) {
+    //         option.selected = 'selected';
+    //     }
+    //     self.$pageSize.append($("<option>", option))
+    // });
+    self.$allRows =$('<span ></span>');
+    self.$pageCurrent = $('<span ></span>');
+    self.$pageAll = $('<span></span>');
+    self.$pageHome = $('<a>').text('首页');
+    self.$pagePrev =  $('<a>').text('上一页');
+    self.$pageNext = $('<a>').text('下一页');
+    self.$pageLast = $('<a>').text('尾页');
+    self.$pageInput = $('<input type="text">');
+    self.$pageGo = $('<a>').text('GO');
+    $.each(self,function(k,v){
+        $body.append("<span style='margin:0 6px' >"+k+"</span>").append(v);
+    })
+    self.$pages = $('<div/>');
+    $body.append($('<div/>').append(self.$pages));
+    $("#allTab").after($body);
+    return self;
+},buildPages = function(dom,pageData,helper){
+    dom.empty();
+    var pageSize = pageData.pageSize,pageAll = Number(pageData.pageAll),pageCurrent = Number(pageData.pageCurrent),allRows = pageData.allRows;
+    var showNum = 5,df = $(document.createDocumentFragment());
+    showNum%2==1||showNum++;//保证为奇数
+    var start,end, hasHead = false,hasTail = false;
+    if(pageAll>showNum){
+        var half = (showNum-1)/2,
+            start = pageCurrent-half,
+            end = pageCurrent+half;
+            hasHead = true,
+            hasTail = true;
 
+        if(start<1){//过于靠前
+            start = 1;
+            end = showNum;
+            hasHead = false;
+        }else if(end>pageAll){//过于靠后
+            end= pageAll;
+            start = pageAll -showNum+1;
+            hasTail = false;
+        }
+    }else{
+        //显示所有
+        start = 1;
+        end = pageAll;
+    }
+    var i=start;
+    if(hasHead)df.append('<span>...<<</span>');
+    for(;i<=end;i++){
+        var pageA = $('<a href="javascript:void();" data-val="'+i+'">'+i+'</a>').on('click',function(){
+            var num = $(this).attr('data-val');
+            helper.goToPageHd(num);
+        })
+        df.append(pageA);
+    }
+
+    hasTail&&df.append('<span>>>...</span>');
+    dom.append(df);
+}
 
 var demoTable = function (target, url, selectData, columns) {
 
@@ -103,7 +170,7 @@ var demoTable = function (target, url, selectData, columns) {
         var arr = str.split('-');
         return new Date(arr[0], arr[1], arr[2]);
     }
-
+    var pageDom = buildPager();
     url = url || './sample.json';
     var tableOpts = {
         //tableClass:'gridTable', //default table class
@@ -135,6 +202,7 @@ var demoTable = function (target, url, selectData, columns) {
          },
 
          */
+        pageDoms:pageDom,
         queryFields: [
             //{type:types.search,field:'name',placeholder:'请输入商品名称',controlFn:function($node){$node.find('input').val('test');}}//,
             {
@@ -216,6 +284,10 @@ var demoTable = function (target, url, selectData, columns) {
         //}
     }
     var bootstrapTable = $target.bootstrapTable(columns, tableOpts);
+    var pageHelper = bootstrapTable.pageHelper;
+    pageHelper.changedFun=function(pageData){
+        buildPages(pageDom.$pages,pageData,pageHelper);
+    }
     return bootstrapTable;
 }
 
