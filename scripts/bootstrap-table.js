@@ -408,6 +408,7 @@
 				});
 				if (self.pageCurrent == 1)self.disableBtns([self.$pageHome, self.$pagePrev]);
 				if (self.pageAll == self.pageCurrent)self.disableBtns([self.$pageLast, self.$pageNext]);
+				self.helper.onResetPageDataHd(pageData);
 			},
 			disableBtns: function (arr) {
 				$.each(arr, function (i, $n) {
@@ -457,70 +458,96 @@
 					.append('页数：').append(self.$pageInput).append(' ')
 					.append(self.$pageGo);
 			},
-			addEvent:function(){
-				var self = this;
-
-                self.$pageSize.on('change', function (e) {
-                    var pageSize = $(this).val();
-                    self.pageSize = pageSize;
-                    self.pageAll = 0;
-                    self.pageCurrent = 1;
-                    self.allRows = 0;
-                    self.refresh()
-                });
-                self.$pageHome .on('click', function () {
-                    if (self.pageCurrent != 1) {
+            buildEventHelper: function () {
+                var self = this;
+                var helper = {
+                    onPageSizeChangeHd: function (e) {
+                        var pageSize = $(this).val();
+                        self.pageSize = pageSize;
+                        self.pageAll = 0;
                         self.pageCurrent = 1;
-                        self.refresh();
-                    }
-                });
-                self.$pagePrev.on('click', function (e) {
-                    if (self.pageCurrent > 1) {
-                        self.pageCurrent--;
-                        self.refresh();
-                    }
-                });
-                self.$pageNext.on('click', function (e) {
-                    if (self.pageCurrent < self.pageAll) {
-                        self.pageCurrent++;
-                        self.refresh();
-                    }
-                });
-                self.$pageLast .on('click', function (e) {
-                    if (self.pageAll != self.pageCurrent) {
-                        self.pageCurrent = self.pageAll;
-                        self.refresh();
-                    }
-                });
-                self.$pageInput .on('keyup keypress', function (e) {//disable auto submit on enter
-                    var code = e.keyCode || e.which;
-                    if (code == 13) {
-                        e.preventDefault();
-                        return false;
-                    }
-                });
-                self.$pageGo .on('click', function (e) {
-                    var pageInput = self.$pageInput.val();
-                    if (!pageInput)return;
-                    var msg = '请输入正确的页数!', errMsg;
-                    if (!/^\d+$/.test(pageInput)) {
-                        errMsg = msg;
-                    } else if (pageInput > self.pageAll || pageInput < 1) {
-                        errMsg = msg;
-                    }
-                    if (errMsg) {
-                        self.alert(errMsg);
-                        return;
-                    } else {
-                        self.pageCurrent = pageInput;
-                        self.refresh();
-                    }
-                });
+                        self.allRows = 0;
+                        self.refresh()
+                    },
+                    goPageStartHd: function () {
+                        if (self.pageCurrent != 1) {
+                            self.pageCurrent = 1;
+                            self.refresh();
+                        }
+                    },
+                    goPagePrevHd: function (e) {
+                        if (self.pageCurrent > 1) {
+                            self.pageCurrent--;
+                            self.refresh();
+                        }
+                    },
+                    goPageNextHd: function (e) {
+                        if (self.pageCurrent < self.pageAll) {
+                            self.pageCurrent++;
+                            self.refresh();
+                        }
+                    },
+                    goPageEndHd: function (e) {
+                        if (self.pageAll != self.pageCurrent) {
+                            self.pageCurrent = self.pageAll;
+                            self.refresh();
+                        }
+                    },
+                    onPageInputChangeHd: function (e) {//disable auto submit on enter
+                        var code = e.keyCode || e.which;
+                        if (code == 13) {
+                            e.preventDefault();
+                            return false;
+                        }
+                    },
+                    goToPageHd: function (pageInput) {
+                        if (!pageInput)return;
+                        var msg = '请输入正确的页数!', errMsg;
+                        if (!/^\d+$/.test(pageInput)) {
+                            errMsg = msg;
+                        } else if (pageInput > self.pageAll || pageInput < 1) {
+                            errMsg = msg;
+                        }
+                        if (errMsg) {
+                            // self.alert(errMsg);
+                            return errMsg;
+                        } else {
+                            self.pageCurrent = pageInput;
+                            self.refresh();
+                        }
+
+                    },
+                    onPageGoClickHd: function (e) {
+                        var pageInput = self.$pageInput.val();
+                        var msg = helper.goToPageHd(pageInput);
+                        msg && alert(msg);
+                    },
+					onChangedFun:function(fun){
+                    	helper.changedFun = fun;
+					},
+                    onResetPageDataHd:function(pageData){
+                        helper.changedFun&&helper.changedFun(pageData);
+					},
+                    changedFun:undefined
+                };
+                self.helper=helper;
+			},
+			addEvent:function(){
+				this.buildEventHelper();
+				var self = this,helper = self.helper;
+                self.$pageSize.on('change', helper.onPageSizeChangeHd);
+                self.$pageHome .on('click', helper.goPageStartHd);
+                self.$pagePrev.on('click', helper.goPagePrevHd);
+                self.$pageNext.on('click', helper.goPageNextHd);
+                self.$pageLast .on('click', helper.goPageEndHd);
+                self.$pageInput .on('keyup keypress', helper.onPageInputChangeHd);
+                self.$pageGo .on('click', helper.onPageGoClickHd);
 			},
 
 			init: function (options) {
 				this.initBody();
 				this.addEvent();
+                this.resetPageData();
 			},
 			initBody:function(){
 				var self = this,opts = this.pagerOpts;
@@ -529,31 +556,30 @@
                 }else{
 					self.getBody(opts);
 				}
-                self.resetPageData();
 			},
 			getBody:function(opts){
-				console.log(opts);
+				// console.log(opts);
                 var self = this;
-                self.$body = $('<div class="pages pageRight" style="margin-top:18px;" /> ');
+                self.$body = opts.$body||$('<div class="pages pageRight" style="margin-top:18px;" /> ');
                 self.$formOuter = $('<form class="form-inline" role="form"/>');
                 self.$form = $('<div class="form-group">');
-                self.$pageSize =  $('<select/>');//.addClass('form-control')
-                $.each(self.pageSizes, function (i, key) {
-                    var opts = {value: key, text: key};
+                self.$pageSize = opts.$pageSize ||$('<select/>');//.addClass('form-control')
+                opts.$pageSize||$.each(self.pageSizes, function (i, key) {
+                    var option = {value: key, text: key};
                     if (key == self.pageSize) {
-                        opts.selected = 'selected';
+                        option.selected = 'selected';
                     }
-                    self.$pageSize.append($("<option>", opts))
+                    self.$pageSize.append($("<option>", option))
                 });
-                self.$allRows = $('<span ></span>');
-                self.$pageCurrent = $('<span ></span>');
-                self.$pageAll = $('<span></span>');
-                self.$pageHome = $('<a>').text('首页');
-                self.$pagePrev = $('<a>').text('上一页');
-                self.$pageNext = $('<a>').text('下一页');
-                self.$pageLast = $('<a>').text('尾页');
-                self.$pageInput = $('<input type="text">');
-                self.$pageGo = $('<a>').text('GO');
+                self.$allRows =opts.$allRows|| $('<span ></span>');
+                self.$pageCurrent = opts.$pageCurrent||$('<span ></span>');
+                self.$pageAll = opts.$pageAll||$('<span></span>');
+                self.$pageHome = opts.$pageHome||$('<a>').text('首页');
+                self.$pagePrev =  opts.$pagePrev ||$('<a>').text('上一页');
+                self.$pageNext = opts.$pageNext || $('<a>').text('下一页');
+                self.$pageLast =opts.$pageLast || $('<a>').text('尾页');
+                self.$pageInput = opts.$pageInput || $('<input type="text">');
+                self.$pageGo =opts.$pageGo|| $('<a>').text('GO');
 			},
 			render: function (res, clean) {
 				var self = this;
@@ -1152,7 +1178,8 @@
 			},
 			drawTableWithData: function (data) {
 				dh.refreshWithLocalData(data);
-			}
+			},
+			pageHelper:ph&&ph.helper
 
 		};
 		return outer;
