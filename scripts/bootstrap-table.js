@@ -511,15 +511,20 @@
                         var msg = '请输入正确的页数!', errMsg;
                         if (!/^\d+$/.test(pageInput)) {
                             errMsg = msg;
-                        } else if (pageInput > self.pageAll || pageInput < 1) {
-                            errMsg = msg;
-                        }
+                        } else{ 
+							pageInput = Number(pageInput);
+							if (pageInput > self.pageAll || pageInput < 1) {
+								errMsg = msg;
+							}
+						}
                         if (errMsg) {
                             // self.alert(errMsg);
                             return errMsg;
                         } else {
-                            self.pageCurrent = pageInput;
-                            self.refresh();
+                             if(self.pageCurrent != pageInput) {//跳转到当前页，无变化
+                                self.pageCurrent = pageInput;
+                                self.refresh();
+                            }
                         }
 
                     },
